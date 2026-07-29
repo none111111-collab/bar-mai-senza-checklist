@@ -1,0 +1,105 @@
+:root {
+  --green: #1e8e3e;
+  --red: #d93025;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --border: #e0e0e0;
+  --text: #202124;
+  --muted: #5f6368;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  background: #202124;
+  color: #fff;
+  padding: 16px 20px;
+}
+header h1 { margin: 0; font-size: 1.2rem; }
+header .sub { font-size: 0.85rem; color: #bbb; margin-top: 2px; }
+
+main { max-width: 720px; margin: 0 auto; padding: 16px; }
+
+.employee-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+.employee-btn {
+  padding: 20px 10px;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+}
+.employee-btn:active { background: #eee; }
+
+.section-title {
+  font-weight: 600;
+  margin: 20px 0 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.task-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.task-label { font-size: 0.98rem; margin-bottom: 8px; }
+.task-actions { display: flex; gap: 8px; }
+.btn-ok, .btn-nonok {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-ok.active { background: var(--green); color: #fff; border-color: var(--green); }
+.btn-nonok.active { background: var(--red); color: #fff; border-color: var(--red); }
+
+.reason-input {
+  margin-top: 8px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.save-status { font-size: 0.75rem; color: var(--muted); margin-top: 6px; height: 14px; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: #8ab4f8;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+table.report { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 0.9rem; }
+table.report th, table.report td { border-bottom: 1px solid var(--border); padding: 8px 6px; text-align: left; }
+table.report th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; }
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.stat-card .num { font-size: 1.6rem; font-weight: 700; }
+.stat-card .lbl { font-size: 0.78rem; color: var(--muted); }
+.pill-ok { color: var(--green); font-weight: 700; }
+.pill-nonok { color: var(--red); font-weight: 700; }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bar Mai Senza - Check List</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div>
+      <h1>Bar Mai Senza</h1>
+      <div class="sub" id="dateLabel"></div>
+    </div>
+    <button class="link-btn" id="switchEmployeeBtn" style="display:none;">cambia dipendente</button>
+  </div>
+</header>
+<main>
+  <div id="employeeScreen">
+    <p>Chi sei?</p>
+    <div class="employee-grid" id="employeeGrid"></div>
+  </div>
+
+  <div id="checklistScreen" style="display:none;">
+    <div id="taskContainer"></div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

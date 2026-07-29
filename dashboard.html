@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resoconto Titolare - Bar Mai Senza</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div>
+      <h1>Resoconto Titolare</h1>
+      <div class="sub">Bar Mai Senza</div>
+    </div>
+    <div>
+      <input type="date" id="datePicker">
+    </div>
+  </div>
+</header>
+<main>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="num" id="statCompilati">-</div><div class="lbl">Controlli compilati</div></div>
+    <div class="stat-card"><div class="num" id="statDisponibili">-</div><div class="lbl">Controlli disponibili</div></div>
+    <div class="stat-card"><div class="num pill-ok" id="statOk">-</div><div class="lbl">Totale OK</div></div>
+    <div class="stat-card"><div class="num pill-nonok" id="statNonOk">-</div><div class="lbl">Totale NON OK</div></div>
+  </div>
+  <div class="stat-card" style="margin-bottom:20px;">
+    <div class="num" id="statPct">-</div>
+    <div class="lbl">Percentuale generale di conformita</div>
+  </div>
+
+  <div class="section-title">Dettaglio per controllo (mansione)</div>
+  <table class="report" id="taskTable">
+    <thead><tr><th>Mansione</th><th>OK</th><th>NON OK</th><th>% OK</th><th>Motivi</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="section-title">Dettaglio per dipendente</div>
+  <table class="report" id="empTable">
+    <thead><tr><th>Dipendente</th><th>Compilate</th><th>OK</th><th>NON OK</th><th>% OK</th><th>Classifica</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>
