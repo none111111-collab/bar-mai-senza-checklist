@@ -40,6 +40,71 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 }
 .employee-btn:active { background: #eee; }
 
+.code-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.code-input {
+  flex: 1;
+  padding: 16px;
+  font-size: 1.6rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+}
+.code-submit {
+  padding: 0 20px;
+  border-radius: 12px;
+  border: none;
+  background: var(--green);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.code-error {
+  margin-top: 10px;
+  color: var(--red);
+  font-size: 0.9rem;
+  min-height: 1.2em;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+  max-width: 320px;
+}
+.admin-form input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 1rem;
+}
+.admin-form-inline {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.admin-form-inline input, .admin-form-inline select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+.inline-input { width: 60px; padding: 4px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); }
+.inline-input-wide { width: 100%; min-width: 180px; padding: 4px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); }
+
 .section-title {
   font-weight: 600;
   margin: 20px 0 8px;

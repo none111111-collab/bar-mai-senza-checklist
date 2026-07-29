@@ -18,8 +18,12 @@
 </header>
 <main>
   <div id="employeeScreen">
-    <p>Chi sei?</p>
-    <div class="employee-grid" id="employeeGrid"></div>
+    <p>Inserisci il tuo codice personale (giorno e mese di nascita)</p>
+    <form id="codeForm" class="code-form">
+      <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="codeInput" class="code-input" placeholder="GGMM" autocomplete="off">
+      <button type="submit" class="code-submit">Entra</button>
+    </form>
+    <div class="code-error" id="codeError"></div>
   </div>
 
   <div id="checklistScreen" style="display:none;">

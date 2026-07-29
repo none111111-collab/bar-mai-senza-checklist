@@ -4,29 +4,49 @@ let allTasks = [];
 const dateLabel = document.getElementById('dateLabel');
 const employeeScreen = document.getElementById('employeeScreen');
 const checklistScreen = document.getElementById('checklistScreen');
-const employeeGrid = document.getElementById('employeeGrid');
+const codeForm = document.getElementById('codeForm');
+const codeInput = document.getElementById('codeInput');
+const codeError = document.getElementById('codeError');
 const switchBtn = document.getElementById('switchEmployeeBtn');
 const taskContainer = document.getElementById('taskContainer');
 
 dateLabel.textContent = new Date().toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
 async function init() {
-  const employees = await fetchEmployees();
-  employeeGrid.innerHTML = '';
-  employees.forEach(emp => {
-    const btn = document.createElement('button');
-    btn.className = 'employee-btn';
-    btn.textContent = emp.name;
-    btn.onclick = () => selectEmployee(emp);
-    employeeGrid.appendChild(btn);
-  });
-
+  // Re-verify against the database on every load: never trust a bare id
+  // sitting in localStorage without confirming the account is still active,
+  // and never store the birth code itself, only the resolved employee id.
   const savedId = localStorage.getItem('employee_id');
   if (savedId) {
-    const emp = employees.find(e => String(e.id) === savedId);
-    if (emp) { await selectEmployee(emp); return; }
+    const { data, error } = await supabaseClient
+      .from('employees')
+      .select('id,name,sort_order')
+      .eq('id', savedId)
+      .eq('active', true)
+      .maybeSingle();
+    if (!error && data) { await selectEmployee(data); return; }
+    localStorage.removeItem('employee_id');
   }
 }
+
+codeForm.onsubmit = async (e) => {
+  e.preventDefault();
+  codeError.textContent = '';
+  const code = codeInput.value.trim();
+  if (!code) return;
+  try {
+    const emp = await fetchEmployeeByCode(code);
+    if (!emp) {
+      codeError.textContent = 'Codice non riconosciuto';
+      codeInput.value = '';
+      codeInput.focus();
+      return;
+    }
+    await selectEmployee(emp);
+  } catch (err) {
+    codeError.textContent = 'Errore: ' + err.message;
+  }
+};
 
 async function selectEmployee(emp) {
   currentEmployee = emp;
@@ -42,6 +62,9 @@ switchBtn.onclick = () => {
   localStorage.removeItem('employee_id');
   checklistScreen.style.display = 'none';
   employeeScreen.style.display = 'block';
+  codeInput.value = '';
+  codeError.textContent = '';
+  codeInput.focus();
 };
 
 async function loadChecklist() {

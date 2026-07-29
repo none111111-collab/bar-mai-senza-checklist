@@ -25,7 +25,21 @@ function todayWeekday() {
 }
 
 async function fetchEmployees() {
-  const { data, error } = await supabaseClient.from('employees').select('*').order('sort_order');
+  // Never select birth_code here: this is used by the public dashboard too,
+  // and codes must stay visible only to the matching employee (via
+  // fetchEmployeeByCode) or the authenticated owner (admin.js).
+  const { data, error } = await supabaseClient.from('employees').select('id,name,sort_order').order('sort_order');
+  if (error) throw error;
+  return data;
+}
+
+async function fetchEmployeeByCode(code) {
+  const { data, error } = await supabaseClient
+    .from('employees')
+    .select('id,name,sort_order')
+    .eq('birth_code', code)
+    .eq('active', true)
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
