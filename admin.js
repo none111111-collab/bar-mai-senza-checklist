@@ -1,3 +1,25 @@
+// Conferma dentro la pagina invece del popup nativo confirm(), che su
+// alcuni browser mobili non si apre correttamente e blocca l'azione.
+function armDeleteButton(btn, onConfirm) {
+  let armed = false;
+  const originalText = btn.textContent;
+  btn.addEventListener('click', async () => {
+    if (!armed) {
+      armed = true;
+      btn.textContent = 'Conferma?';
+      btn.style.background = 'var(--red)';
+      btn.style.color = '#fff';
+      setTimeout(() => {
+        if (armed) { armed = false; btn.textContent = originalText; btn.style.background = ''; btn.style.color = ''; }
+      }, 3000);
+      return;
+    }
+    armed = false;
+    btn.disabled = true;
+    await onConfirm();
+  });
+}
+
 const loginScreen = document.getElementById('loginScreen');
 const adminScreen = document.getElementById('adminScreen');
 const loginForm = document.getElementById('loginForm');
@@ -112,12 +134,11 @@ async function loadEmployees() {
     const delBtn = document.createElement('button');
     delBtn.textContent = 'Elimina';
     delBtn.className = 'link-btn';
-    delBtn.onclick = async () => {
-      if (!confirm(`Eliminare definitivamente ${emp.name}? Lo storico dei controlli passati resterà comunque salvato.`)) return;
+    armDeleteButton(delBtn, async () => {
       const { error } = await supabaseClient.from('employees').delete().eq('id', emp.id);
       if (error) { alert('Errore: ' + error.message); return; }
       await loadEmployees();
-    };
+    });
     actionTd.appendChild(delBtn);
 
     tr.appendChild(nameTd);
@@ -191,12 +212,11 @@ async function loadTasks() {
     const delBtn = document.createElement('button');
     delBtn.textContent = 'Elimina';
     delBtn.className = 'link-btn';
-    delBtn.onclick = async () => {
-      if (!confirm(`Eliminare definitivamente "${task.label}"? Lo storico dei controlli passati resterà comunque salvato.`)) return;
+    armDeleteButton(delBtn, async () => {
       const { error } = await supabaseClient.from('tasks').delete().eq('id', task.id);
       if (error) { alert('Errore: ' + error.message); return; }
       await loadTasks();
-    };
+    });
     actionTd.appendChild(delBtn);
 
     tr.appendChild(sectionTd);
