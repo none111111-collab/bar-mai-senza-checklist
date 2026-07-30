@@ -26,6 +26,20 @@
     <div class="code-error" id="codeError"></div>
   </div>
 
+  <div id="shiftScreen" style="display:none;">
+    <p>A che ora hai iniziato/finirai il turno oggi?</p>
+    <form id="shiftForm" class="admin-form">
+      <label style="font-size:0.85rem;color:var(--muted);">Dalle
+        <input type="time" id="shiftStart" required>
+      </label>
+      <label style="font-size:0.85rem;color:var(--muted);">Alle
+        <input type="time" id="shiftEnd" required>
+      </label>
+      <button type="submit" class="code-submit">Continua</button>
+    </form>
+    <div class="code-error" id="shiftError"></div>
+  </div>
+
   <div id="checklistScreen" style="display:none;">
     <div id="taskContainer"></div>
   </div>

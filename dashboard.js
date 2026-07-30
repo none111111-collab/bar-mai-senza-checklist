@@ -24,6 +24,7 @@ async function loadDashboard(dateStr) {
   renderTaskTable(checks, tasksToday);
   renderEmployeeTable(checks, employeesCache, tasksToday);
   await renderRanking();
+  await renderWeeklyHours();
 }
 
 const rankingMonthPicker = document.getElementById('rankingMonthPicker');
@@ -147,6 +148,76 @@ function renderEmployeeTable(checks, employees, tasksToday) {
       <td class="pill-nonok">${r.nonOk}</td>
       <td>${r.pct < 0 ? '-' : r.pct + '%'}</td>
       <td>${rankOf[r.name]}&deg;</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// --- Resoconto orario settimanale ---
+const weekPicker = document.getElementById('weekPicker');
+function currentIsoWeek() {
+  const d = new Date();
+  const day = (d.getDay() + 6) % 7; // 0=Monday
+  d.setDate(d.getDate() - day + 3); // nearest Thursday
+  const firstThursday = new Date(d.getFullYear(), 0, 4);
+  const week = 1 + Math.round(((d - firstThursday) / 86400000 - 3 + ((firstThursday.getDay() + 6) % 7)) / 7);
+  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
+}
+function isoWeekToMonday(isoWeekStr) {
+  const [yearStr, weekStr] = isoWeekStr.split('-W');
+  const year = parseInt(yearStr, 10);
+  const week = parseInt(weekStr, 10);
+  const jan4 = new Date(year, 0, 4);
+  const jan4Day = (jan4.getDay() + 6) % 7;
+  const week1Monday = new Date(jan4);
+  week1Monday.setDate(jan4.getDate() - jan4Day);
+  const monday = new Date(week1Monday);
+  monday.setDate(week1Monday.getDate() + (week - 1) * 7);
+  return monday;
+}
+function dateToISO(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function hoursBetween(startTime, endTime) {
+  const [sh, sm] = startTime.split(':').map(Number);
+  const [eh, em] = endTime.split(':').map(Number);
+  return ((eh * 60 + em) - (sh * 60 + sm)) / 60;
+}
+
+weekPicker.value = currentIsoWeek();
+weekPicker.onchange = () => renderWeeklyHours();
+
+async function renderWeeklyHours() {
+  const isoWeek = weekPicker.value || currentIsoWeek();
+  const monday = isoWeekToMonday(isoWeek);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(dateToISO(d));
+  }
+
+  const { data: shiftsData, error } = await supabaseClient
+    .from('employee_shifts')
+    .select('employee_id,work_date,start_time,end_time')
+    .gte('work_date', days[0])
+    .lte('work_date', days[6]);
+
+  const tbody = document.querySelector('#hoursTable tbody');
+  tbody.innerHTML = '';
+  if (error) { tbody.innerHTML = `<tr><td colspan="9">Errore: ${error.message}</td></tr>`; return; }
+
+  employeesCache.forEach(emp => {
+    const empShifts = (shiftsData || []).filter(s => s.employee_id === emp.id);
+    const hoursByDay = days.map(day => {
+      const s = empShifts.find(x => x.work_date === day);
+      return s ? hoursBetween(s.start_time, s.end_time) : 0;
+    });
+    const total = hoursByDay.reduce((a, b) => a + b, 0);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${emp.name}</td>` +
+      hoursByDay.map(h => `<td>${h > 0 ? h.toFixed(1) : '-'}</td>`).join('') +
+      `<td><strong>${total.toFixed(1)}</strong></td>`;
     tbody.appendChild(tr);
   });
 }

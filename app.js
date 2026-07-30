@@ -3,10 +3,15 @@ let allTasks = [];
 
 const dateLabel = document.getElementById('dateLabel');
 const employeeScreen = document.getElementById('employeeScreen');
+const shiftScreen = document.getElementById('shiftScreen');
 const checklistScreen = document.getElementById('checklistScreen');
 const codeForm = document.getElementById('codeForm');
 const codeInput = document.getElementById('codeInput');
 const codeError = document.getElementById('codeError');
+const shiftForm = document.getElementById('shiftForm');
+const shiftStart = document.getElementById('shiftStart');
+const shiftEnd = document.getElementById('shiftEnd');
+const shiftError = document.getElementById('shiftError');
 const switchBtn = document.getElementById('switchEmployeeBtn');
 const taskContainer = document.getElementById('taskContainer');
 
@@ -51,16 +56,53 @@ codeForm.onsubmit = async (e) => {
 async function selectEmployee(emp) {
   currentEmployee = emp;
   localStorage.setItem('employee_id', emp.id);
-  employeeScreen.style.display = 'none';
-  checklistScreen.style.display = 'block';
   switchBtn.style.display = 'inline';
-  await loadChecklist();
+
+  const { data: existingShift } = await supabaseClient
+    .from('employee_shifts')
+    .select('*')
+    .eq('employee_id', emp.id)
+    .eq('work_date', todayISO())
+    .maybeSingle();
+
+  employeeScreen.style.display = 'none';
+  if (existingShift) {
+    shiftScreen.style.display = 'none';
+    checklistScreen.style.display = 'block';
+    await loadChecklist();
+  } else {
+    checklistScreen.style.display = 'none';
+    shiftScreen.style.display = 'block';
+    shiftStart.value = '';
+    shiftEnd.value = '';
+    shiftError.textContent = '';
+  }
 }
+
+shiftForm.onsubmit = async (e) => {
+  e.preventDefault();
+  shiftError.textContent = '';
+  if (shiftEnd.value <= shiftStart.value) {
+    shiftError.textContent = 'L\'orario di fine deve essere dopo quello di inizio';
+    return;
+  }
+  const { error } = await supabaseClient.from('employee_shifts').upsert({
+    employee_id: currentEmployee.id,
+    work_date: todayISO(),
+    start_time: shiftStart.value,
+    end_time: shiftEnd.value
+  }, { onConflict: 'employee_id,work_date' });
+  if (error) { shiftError.textContent = 'Errore: ' + error.message; return; }
+  shiftScreen.style.display = 'none';
+  checklistScreen.style.display = 'block';
+  await loadChecklist();
+};
 
 switchBtn.onclick = () => {
   currentEmployee = null;
   localStorage.removeItem('employee_id');
   checklistScreen.style.display = 'none';
+  shiftScreen.style.display = 'none';
   employeeScreen.style.display = 'block';
   codeInput.value = '';
   codeError.textContent = '';
