@@ -30,8 +30,12 @@
   <div id="adminScreen" style="display:none;">
 
     <div class="section-title">Dipendenti</div>
+    <div class="admin-form-inline" style="margin-bottom:10px;">
+      <label for="hoursMonthPicker" style="align-self:center;font-size:0.85rem;color:var(--muted);">Ore lavorate del mese:</label>
+      <input type="month" id="hoursMonthPicker">
+    </div>
     <table class="report" id="employeeTable">
-      <thead><tr><th>Nome</th><th>Codice (GGMM)</th><th>Ore lavorate</th><th>Attivo</th><th></th></tr></thead>
+      <thead><tr><th>Nome</th><th>Codice (GGMM)</th><th>Ore lavorate (mese selezionato)</th><th>Attivo</th><th></th></tr></thead>
       <tbody></tbody>
     </table>
     <form id="newEmployeeForm" class="admin-form-inline">

@@ -28,7 +28,7 @@ async function fetchEmployees() {
   // Never select birth_code here: this is used by the public dashboard too,
   // and codes must stay visible only to the matching employee (via
   // fetchEmployeeByCode) or the authenticated owner (admin.js).
-  const { data, error } = await supabaseClient.from('employees').select('id,name,sort_order,hours_worked').order('sort_order');
+  const { data, error } = await supabaseClient.from('employees').select('id,name,sort_order').order('sort_order');
   if (error) throw error;
   return data;
 }

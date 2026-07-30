@@ -30,7 +30,10 @@
     <div class="lbl">Percentuale generale di conformita</div>
   </div>
 
-  <div class="section-title">Classifica miglior dipendente (tutto il periodo)</div>
+  <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+    <span>Classifica miglior dipendente</span>
+    <input type="month" id="rankingMonthPicker">
+  </div>
   <table class="report" id="rankingTable">
     <thead><tr><th>Posizione</th><th>Dipendente</th><th>Punti (giorn. x1 + sett. x2)</th><th>Ore lavorate</th><th>Rapporto punti/ora</th></tr></thead>
     <tbody></tbody>
@@ -44,7 +47,7 @@
 
   <div class="section-title">Dettaglio per dipendente</div>
   <table class="report" id="empTable">
-    <thead><tr><th>Dipendente</th><th>Compilate</th><th>OK</th><th>NON OK</th><th>% OK</th><th>Classifica</th></tr></thead>
+    <thead><tr><th>Dipendente</th><th>Compilate</th><th>OK</th><th>NON OK</th><th>% OK</th><th>Posizione (giorno)</th></tr></thead>
     <tbody></tbody>
   </table>
 </main>

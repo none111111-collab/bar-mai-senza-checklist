@@ -39,6 +39,14 @@ logoutBtn.onclick = async () => {
   location.reload();
 };
 
+const hoursMonthPicker = document.getElementById('hoursMonthPicker');
+function currentYearMonth() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+hoursMonthPicker.value = currentYearMonth();
+hoursMonthPicker.onchange = () => loadEmployees();
+
 async function showAdmin() {
   loginScreen.style.display = 'none';
   adminScreen.style.display = 'block';
@@ -48,7 +56,12 @@ async function showAdmin() {
 }
 
 async function loadEmployees() {
+  const yearMonth = hoursMonthPicker.value || currentYearMonth();
   const { data, error } = await supabaseClient.from('employees').select('*').order('sort_order');
+  const { data: hoursRows } = await supabaseClient.from('employee_hours').select('*').eq('year_month', yearMonth);
+  const hoursByEmp = {};
+  (hoursRows || []).forEach(h => { hoursByEmp[h.employee_id] = h.hours; });
+
   const tbody = document.querySelector('#employeeTable tbody');
   tbody.innerHTML = '';
   if (error) { tbody.innerHTML = `<tr><td colspan="5">Errore: ${error.message}</td></tr>`; return; }
@@ -75,10 +88,14 @@ async function loadEmployees() {
     hoursInput.type = 'number';
     hoursInput.step = '0.5';
     hoursInput.min = '0';
-    hoursInput.value = emp.hours_worked || 0;
+    hoursInput.value = hoursByEmp[emp.id] || 0;
     hoursInput.className = 'inline-input';
     hoursInput.onchange = async () => {
-      await supabaseClient.from('employees').update({ hours_worked: parseFloat(hoursInput.value) || 0 }).eq('id', emp.id);
+      await supabaseClient.from('employee_hours').upsert({
+        employee_id: emp.id,
+        year_month: yearMonth,
+        hours: parseFloat(hoursInput.value) || 0
+      }, { onConflict: 'employee_id,year_month' });
     };
     hoursTd.appendChild(hoursInput);
 

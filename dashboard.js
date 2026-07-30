@@ -26,8 +26,31 @@ async function loadDashboard(dateStr) {
   await renderRanking();
 }
 
+const rankingMonthPicker = document.getElementById('rankingMonthPicker');
+function currentYearMonth() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+rankingMonthPicker.value = currentYearMonth();
+rankingMonthPicker.onchange = () => renderRanking();
+
 async function renderRanking() {
-  const { data: allChecks, error } = await supabaseClient.from('checks').select('employee_id,task_id,status');
+  const yearMonth = rankingMonthPicker.value || currentYearMonth();
+  const [y, m] = yearMonth.split('-').map(Number);
+  const monthStart = `${yearMonth}-01`;
+  const nextMonth = new Date(y, m, 1); // m is 1-based here -> already next month index
+  const monthEnd = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`;
+
+  const { data: monthChecks, error } = await supabaseClient
+    .from('checks')
+    .select('employee_id,task_id,status')
+    .gte('check_date', monthStart)
+    .lt('check_date', monthEnd);
+
+  const { data: hoursRows } = await supabaseClient.from('employee_hours').select('*').eq('year_month', yearMonth);
+  const hoursByEmp = {};
+  (hoursRows || []).forEach(h => { hoursByEmp[h.employee_id] = Number(h.hours) || 0; });
+
   const tbody = document.querySelector('#rankingTable tbody');
   tbody.innerHTML = '';
   if (error) { tbody.innerHTML = `<tr><td colspan="5">Errore: ${error.message}</td></tr>`; return; }
@@ -36,13 +59,13 @@ async function renderRanking() {
   tasksCache.forEach(t => { sectionByTaskId[t.id] = t.section; });
 
   const rows = employeesCache.map(emp => {
-    const empChecks = allChecks.filter(c => c.employee_id === emp.id && c.status === 'OK');
+    const empChecks = monthChecks.filter(c => c.employee_id === emp.id && c.status === 'OK');
     let points = 0;
     empChecks.forEach(c => {
       const section = sectionByTaskId[c.task_id];
       points += section === 'settimanale' ? 2 : 1;
     });
-    const hours = Number(emp.hours_worked) || 0;
+    const hours = hoursByEmp[emp.id] || 0;
     const ratio = hours > 0 ? points / hours : null;
     return { name: emp.name, points, hours, ratio };
   });
