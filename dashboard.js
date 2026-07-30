@@ -23,6 +23,46 @@ async function loadDashboard(dateStr) {
   renderStats(checks, tasksToday);
   renderTaskTable(checks, tasksToday);
   renderEmployeeTable(checks, employeesCache, tasksToday);
+  await renderRanking();
+}
+
+async function renderRanking() {
+  const { data: allChecks, error } = await supabaseClient.from('checks').select('employee_id,task_id,status');
+  const tbody = document.querySelector('#rankingTable tbody');
+  tbody.innerHTML = '';
+  if (error) { tbody.innerHTML = `<tr><td colspan="5">Errore: ${error.message}</td></tr>`; return; }
+
+  const sectionByTaskId = {};
+  tasksCache.forEach(t => { sectionByTaskId[t.id] = t.section; });
+
+  const rows = employeesCache.map(emp => {
+    const empChecks = allChecks.filter(c => c.employee_id === emp.id && c.status === 'OK');
+    let points = 0;
+    empChecks.forEach(c => {
+      const section = sectionByTaskId[c.task_id];
+      points += section === 'settimanale' ? 2 : 1;
+    });
+    const hours = Number(emp.hours_worked) || 0;
+    const ratio = hours > 0 ? points / hours : null;
+    return { name: emp.name, points, hours, ratio };
+  });
+
+  const ranked = [...rows].sort((a, b) => {
+    if (a.ratio === null && b.ratio === null) return 0;
+    if (a.ratio === null) return 1;
+    if (b.ratio === null) return -1;
+    return b.ratio - a.ratio;
+  });
+
+  ranked.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i + 1}&deg;</td>
+      <td>${r.name}</td>
+      <td>${r.points}</td>
+      <td>${r.hours}</td>
+      <td>${r.ratio === null ? 'inserire ore' : r.ratio.toFixed(2)}</td>`;
+    tbody.appendChild(tr);
+  });
 }
 
 function renderStats(checks, tasksToday) {
