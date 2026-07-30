@@ -11,14 +11,24 @@ async function init() {
   }
 }
 
+// Il codice a 4 cifre e' solo la porta d'accesso semplificata: dietro le
+// quinte accede sempre con lo stesso account Supabase Auth reale (necessario
+// perche' le regole di sicurezza del database richiedono un vero login).
+const OWNER_CODES = ['2804', '0512'];
+const OWNER_EMAIL = 'roman.bova@polocelli.it';
+const OWNER_PASSWORD = 'ZuuMic609KL8ZXCe29';
+
 loginForm.onsubmit = async (e) => {
   e.preventDefault();
   loginError.textContent = '';
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
-  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  const code = document.getElementById('loginCode').value.trim();
+  if (!OWNER_CODES.includes(code)) {
+    loginError.textContent = 'Codice non riconosciuto';
+    return;
+  }
+  const { error } = await supabaseClient.auth.signInWithPassword({ email: OWNER_EMAIL, password: OWNER_PASSWORD });
   if (error) {
-    loginError.textContent = 'Accesso negato: ' + error.message;
+    loginError.textContent = 'Errore di accesso: ' + error.message;
     return;
   }
   showAdmin();

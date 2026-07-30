@@ -19,11 +19,10 @@
 <main>
 
   <div id="loginScreen">
-    <p>Accedi con la tua email e password</p>
-    <form id="loginForm" class="admin-form">
-      <input type="email" id="loginEmail" placeholder="Email" autocomplete="username" required>
-      <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
-      <button type="submit" class="code-submit">Accedi</button>
+    <p>Inserisci il codice titolare</p>
+    <form id="loginForm" class="code-form">
+      <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="loginCode" class="code-input" placeholder="····" autocomplete="off" required>
+      <button type="submit" class="code-submit">Entra</button>
     </form>
     <div class="code-error" id="loginError"></div>
   </div>
