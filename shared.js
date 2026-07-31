@@ -47,7 +47,7 @@ async function fetchTodayTasks() {
   const { data, error } = await supabaseClient
     .from('tasks')
     .select('*')
-    .or(`section.neq.settimanale,day_of_week.eq.${wd}`)
+    .or(`section.neq.settimanale,days_of_week.cs.{${wd}}`)
     .order('sort_order');
   if (error) throw error;
   return data;
@@ -66,5 +66,5 @@ function weekdayForDateStr(dateStr) {
 
 function tasksForDate(allTasksList, dateStr) {
   const wd = weekdayForDateStr(dateStr);
-  return allTasksList.filter(t => t.section !== 'settimanale' || t.day_of_week === wd);
+  return allTasksList.filter(t => t.section !== 'settimanale' || (t.days_of_week || []).includes(wd));
 }

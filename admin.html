@@ -56,15 +56,15 @@
         <option value="chiusura">Chiusura</option>
         <option value="settimanale">Settimanale</option>
       </select>
-      <select id="newTaskDay" style="display:none;">
-        <option value="lunedi">Lunedi</option>
-        <option value="martedi">Martedi</option>
-        <option value="mercoledi">Mercoledi</option>
-        <option value="giovedi">Giovedi</option>
-        <option value="venerdi">Venerdi</option>
-        <option value="sabato">Sabato</option>
-        <option value="domenica">Domenica</option>
-      </select>
+      <div id="newTaskDays" class="day-checks" style="display:none;">
+        <label><input type="checkbox" value="lunedi"> Lun</label>
+        <label><input type="checkbox" value="martedi"> Mar</label>
+        <label><input type="checkbox" value="mercoledi"> Mer</label>
+        <label><input type="checkbox" value="giovedi"> Gio</label>
+        <label><input type="checkbox" value="venerdi"> Ven</label>
+        <label><input type="checkbox" value="sabato"> Sab</label>
+        <label><input type="checkbox" value="domenica"> Dom</label>
+      </div>
       <input type="text" id="newTaskLabel" placeholder="Nome mansione" required>
       <button type="submit" class="code-submit">Aggiungi</button>
     </form>

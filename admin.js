@@ -173,9 +173,9 @@ document.getElementById('newEmployeeForm').onsubmit = async (e) => {
 };
 
 const newTaskSection = document.getElementById('newTaskSection');
-const newTaskDay = document.getElementById('newTaskDay');
+const newTaskDays = document.getElementById('newTaskDays');
 newTaskSection.onchange = () => {
-  newTaskDay.style.display = newTaskSection.value === 'settimanale' ? 'inline-block' : 'none';
+  newTaskDays.style.display = newTaskSection.value === 'settimanale' ? 'flex' : 'none';
 };
 
 async function loadTasks() {
@@ -191,7 +191,9 @@ async function loadTasks() {
     sectionTd.textContent = task.section;
 
     const dayTd = document.createElement('td');
-    dayTd.textContent = task.day_of_week || '-';
+    dayTd.textContent = (task.days_of_week && task.days_of_week.length)
+      ? task.days_of_week.map(d => WEEKDAY_LABEL[d] || d).join(', ')
+      : '-';
 
     const labelTd = document.createElement('td');
     const labelInput = document.createElement('input');
@@ -236,18 +238,23 @@ document.getElementById('newTaskForm').onsubmit = async (e) => {
   e.preventDefault();
   const labelInput = document.getElementById('newTaskLabel');
   const section = newTaskSection.value;
-  const day = section === 'settimanale' ? newTaskDay.value : null;
+  const days = Array.from(newTaskDays.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+  if (section === 'settimanale' && days.length === 0) {
+    alert('Seleziona almeno un giorno per una mansione settimanale');
+    return;
+  }
   const { data: existing } = await supabaseClient.from('tasks').select('sort_order').order('sort_order', { ascending: false }).limit(1);
   const nextSort = existing && existing.length ? existing[0].sort_order + 1 : 1;
   const { error } = await supabaseClient.from('tasks').insert({
     section,
-    day_of_week: day,
+    days_of_week: section === 'settimanale' ? days : null,
     label: labelInput.value.trim(),
     sort_order: nextSort,
     active: true
   });
   if (error) { alert('Errore: ' + error.message); return; }
   labelInput.value = '';
+  newTaskDays.querySelectorAll('input[type=checkbox]').forEach(cb => { cb.checked = false; });
   await loadTasks();
 };
 
