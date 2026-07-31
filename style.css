@@ -87,11 +87,33 @@ main { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
 }
 .employee-btn:active { transform: scale(0.97); background: var(--cream); }
 
-.code-form {
+.code-form, .code-form-wrap {
   display: flex;
   gap: 10px;
   margin-top: 18px;
 }
+.code-form-wrap {
+  flex-direction: column;
+}
+.shift-row {
+  display: flex;
+  gap: 10px;
+}
+.shift-row label {
+  flex: 1;
+}
+.shift-row input[type="time"] {
+  width: 100%;
+  margin-top: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 1rem;
+  box-shadow: var(--shadow);
+}
+.shift-row input[type="time"]:focus { outline: none; border-color: var(--caramel); }
 .code-input {
   flex: 1;
   min-width: 0;

@@ -19,25 +19,19 @@
 <main>
   <div id="employeeScreen">
     <p>Inserisci il tuo codice personale</p>
-    <form id="codeForm" class="code-form">
+    <form id="codeForm" class="code-form-wrap">
       <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="codeInput" class="code-input" placeholder="····" autocomplete="off">
+      <div class="shift-row">
+        <label style="font-size:0.85rem;color:var(--muted);">Dalle
+          <input type="time" id="shiftStart">
+        </label>
+        <label style="font-size:0.85rem;color:var(--muted);">Alle
+          <input type="time" id="shiftEnd">
+        </label>
+      </div>
       <button type="submit" class="code-submit">Entra</button>
     </form>
     <div class="code-error" id="codeError"></div>
-  </div>
-
-  <div id="shiftScreen" style="display:none;">
-    <p>A che ora hai iniziato/finirai il turno oggi?</p>
-    <form id="shiftForm" class="admin-form">
-      <label style="font-size:0.85rem;color:var(--muted);">Dalle
-        <input type="time" id="shiftStart" required>
-      </label>
-      <label style="font-size:0.85rem;color:var(--muted);">Alle
-        <input type="time" id="shiftEnd" required>
-      </label>
-      <button type="submit" class="code-submit">Continua</button>
-    </form>
-    <div class="code-error" id="shiftError"></div>
   </div>
 
   <div id="checklistScreen" style="display:none;">
