@@ -15,6 +15,15 @@ const taskContainer = document.getElementById('taskContainer');
 dateLabel.textContent = new Date().toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
 async function init() {
+  // A titolare session takes priority over any saved employee id: the same
+  // code entry screen serves both, and an authenticated admin session is
+  // the stronger signal (it can only exist after a real login already happened).
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    await showAdmin();
+    return;
+  }
+
   // Re-verify against the database on every load: never trust a bare id
   // sitting in localStorage without confirming the account is still active,
   // and never store the birth code itself, only the resolved employee id.
@@ -54,18 +63,33 @@ codeForm.onsubmit = async (e) => {
   codeError.textContent = '';
   const code = codeInput.value.trim();
   if (!code) return;
+
+  // One code box for everyone: try it as an employee code first (the common
+  // case, one lookup), then fall back to the titolare code. The real owner
+  // codes never reach the client, so there is no way to tell them apart
+  // without asking the server either way.
   try {
     const emp = await fetchEmployeeByCode(code);
-    if (!emp) {
-      codeError.textContent = 'Codice non riconosciuto';
-      codeInput.value = '';
-      codeInput.focus();
-      return;
-    }
-    await selectEmployee(emp);
+    if (emp) { await selectEmployee(emp); return; }
   } catch (err) {
     codeError.textContent = 'Errore: ' + err.message;
+    return;
   }
+
+  const { data, error } = await supabaseClient.functions.invoke('admin-login', { body: { code } });
+  if (!error && data && data.access_token) {
+    const { error: sessionError } = await supabaseClient.auth.setSession({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token
+    });
+    if (sessionError) { codeError.textContent = 'Errore di accesso: ' + sessionError.message; return; }
+    await showAdmin();
+    return;
+  }
+
+  codeError.textContent = 'Codice non riconosciuto';
+  codeInput.value = '';
+  codeInput.focus();
 };
 
 async function selectEmployee(emp) {

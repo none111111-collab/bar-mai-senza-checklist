@@ -14,6 +14,7 @@
       <div class="sub" id="dateLabel"></div>
     </div>
     <button class="link-btn" id="switchEmployeeBtn" style="display:none;">cambia dipendente</button>
+    <button class="link-btn" id="logoutBtn" style="display:none;">esci</button>
   </div>
 </header>
 <main>
@@ -37,11 +38,56 @@
   <div id="checklistScreen" style="display:none;">
     <div id="taskContainer"></div>
   </div>
+
+  <div id="adminScreen" style="display:none;">
+
+    <div class="section-title">Dipendenti</div>
+    <div class="admin-form-inline" style="margin-bottom:10px;">
+      <label for="hoursMonthPicker" style="align-self:center;font-size:0.85rem;color:var(--muted);">Ore lavorate del mese:</label>
+      <input type="month" id="hoursMonthPicker">
+    </div>
+    <table class="report" id="employeeTable">
+      <thead><tr><th>Nome</th><th>Codice (GGMM)</th><th>Ore lavorate (mese selezionato)</th><th>Attivo</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <form id="newEmployeeForm" class="admin-form-inline">
+      <input type="text" id="newEmpName" placeholder="Nome dipendente" required>
+      <input type="tel" id="newEmpCode" placeholder="GGMM" maxlength="4" required>
+      <button type="submit" class="code-submit">Aggiungi</button>
+    </form>
+
+    <div class="section-title" style="margin-top:28px;">Mansioni</div>
+    <table class="report" id="taskTable">
+      <thead><tr><th>Sezione</th><th>Giorno</th><th>Mansione</th><th>Attiva</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <form id="newTaskForm" class="admin-form-inline">
+      <select id="newTaskSection">
+        <option value="apertura">Apertura</option>
+        <option value="pranzo">Pranzo</option>
+        <option value="chiusura">Chiusura</option>
+        <option value="settimanale">Settimanale</option>
+      </select>
+      <div id="newTaskDays" class="day-checks" style="display:none;">
+        <label><input type="checkbox" value="lunedi"> Lun</label>
+        <label><input type="checkbox" value="martedi"> Mar</label>
+        <label><input type="checkbox" value="mercoledi"> Mer</label>
+        <label><input type="checkbox" value="giovedi"> Gio</label>
+        <label><input type="checkbox" value="venerdi"> Ven</label>
+        <label><input type="checkbox" value="sabato"> Sab</label>
+        <label><input type="checkbox" value="domenica"> Dom</label>
+      </div>
+      <input type="text" id="newTaskLabel" placeholder="Nome mansione" required>
+      <button type="submit" class="code-submit">Aggiungi</button>
+    </form>
+
+  </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="shared.js"></script>
+<script src="admin.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

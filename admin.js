@@ -20,45 +20,8 @@ function armDeleteButton(btn, onConfirm) {
   });
 }
 
-const loginScreen = document.getElementById('loginScreen');
 const adminScreen = document.getElementById('adminScreen');
-const loginForm = document.getElementById('loginForm');
-const loginError = document.getElementById('loginError');
 const logoutBtn = document.getElementById('logoutBtn');
-
-async function init() {
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if (session) {
-    showAdmin();
-  }
-}
-
-// Il codice a 4 cifre e' solo la porta d'accesso semplificata: dietro le
-// quinte accede sempre con lo stesso account Supabase Auth reale (necessario
-// perche' le regole di sicurezza del database richiedono un vero login).
-// Il controllo del codice e la password vera restano nella funzione
-// "admin-login" lato server: qui non c'e' piu' nessun segreto da leggere.
-loginForm.onsubmit = async (e) => {
-  e.preventDefault();
-  loginError.textContent = '';
-  const code = document.getElementById('loginCode').value.trim();
-  if (!code) return;
-
-  const { data, error } = await supabaseClient.functions.invoke('admin-login', { body: { code } });
-  if (error || !data || !data.access_token) {
-    loginError.textContent = 'Codice non riconosciuto';
-    return;
-  }
-  const { error: sessionError } = await supabaseClient.auth.setSession({
-    access_token: data.access_token,
-    refresh_token: data.refresh_token
-  });
-  if (sessionError) {
-    loginError.textContent = 'Errore di accesso: ' + sessionError.message;
-    return;
-  }
-  showAdmin();
-};
 
 logoutBtn.onclick = async () => {
   await supabaseClient.auth.signOut();
@@ -74,7 +37,8 @@ hoursMonthPicker.value = currentYearMonth();
 hoursMonthPicker.onchange = () => loadEmployees();
 
 async function showAdmin() {
-  loginScreen.style.display = 'none';
+  employeeScreen.style.display = 'none';
+  checklistScreen.style.display = 'none';
   adminScreen.style.display = 'block';
   logoutBtn.style.display = 'inline';
   await loadEmployees();
@@ -257,5 +221,3 @@ document.getElementById('newTaskForm').onsubmit = async (e) => {
   newTaskDays.querySelectorAll('input[type=checkbox]').forEach(cb => { cb.checked = false; });
   await loadTasks();
 };
-
-init();
