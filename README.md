@@ -19,8 +19,10 @@ nessuno puo' spacciarsi per un collega.
 
 ## Pannello titolare
 
-`admin.html` richiede email e password (account Supabase Auth dedicato, creato
-una volta sola). Da li' si possono:
+`admin.html` chiede il codice a 4 cifre del titolare. Il codice viene verificato
+dalla funzione server-side `supabase/functions/admin-login` (vedi sotto), che se
+corretto restituisce una sessione valida dell'account Supabase Auth dedicato.
+Da li' si possono:
 - aggiungere o disattivare dipendenti e assegnare/cambiare il loro codice
 - aggiungere o disattivare mansioni della check list
 - eliminare definitivamente una voce (lo storico dei controlli gia' fatti resta comunque salvato)
@@ -31,12 +33,28 @@ una volta sola). Da li' si possono:
   modificare l'elenco di dipendenti o mansioni.
 - Solo l'account autenticato nel pannello titolare puo' scrivere su `employees` e `tasks`
   (regole di Row Level Security in `migration_admin.sql`).
-- Il codice personale (`birth_code`) non viene mai restituito dalle pagine pubbliche
-  (dashboard, lista dipendenti): e' leggibile solo durante il login con il codice esatto,
-  o dal pannello titolare autenticato.
-- Essendo un codice a 4 cifre (GGMM), non e' una protezione fortissima contro un
-  tentativo deliberato e sistematico - e' pensato per impedire lo scambio "per sbaglio
-  o comodita'" tra colleghi, non come sicurezza bancaria.
+- Il codice personale (`birth_code`) non e' leggibile dal client con la anon key,
+  nemmeno interrogando direttamente l'API (vedi `migration_security_fix.sql`): la
+  colonna e' bloccata a livello di database, il confronto "codice -> dipendente"
+  avviene dentro la funzione `match_employee_code` (security definer) che restituisce
+  solo id/nome/ordine, mai il codice stesso.
+- La vera email e password dell'account titolare NON stanno piu' nel codice del sito
+  (prima erano in chiaro in `admin.js`, leggibili da chiunque nel repo pubblico).
+  Stanno solo come secret della funzione `admin-login` (`supabase secrets set`), che
+  gira lato server e non le espone mai al browser. Il client manda solo il codice a
+  4 cifre alla funzione e riceve indietro una sessione gia' valida.
+- Essendo un codice a 4 cifre (GGMM per i dipendenti, un codice a scelta per il
+  titolare), non e' una protezione fortissima contro un tentativo deliberato e
+  sistematico - e' pensato per impedire lo scambio "per sbaglio o comodita'" tra
+  colleghi, non come sicurezza bancaria. Quello che conta e' che non ci sia piu'
+  nessun vero segreto (password reale, codici) leggibile dal codice pubblico del sito.
+
+### Se serve rigenerare i secret della funzione admin-login
+
+```
+supabase secrets set --project-ref <ref> OWNER_CODES="2804,0303" OWNER_EMAIL="..." OWNER_PASSWORD="..."
+supabase functions deploy admin-login --project-ref <ref> --no-verify-jwt
+```
 
 ## Se serve ripartire da zero su un nuovo progetto Supabase
 

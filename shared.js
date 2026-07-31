@@ -34,14 +34,12 @@ async function fetchEmployees() {
 }
 
 async function fetchEmployeeByCode(code) {
-  const { data, error } = await supabaseClient
-    .from('employees')
-    .select('id,name,sort_order')
-    .eq('birth_code', code)
-    .eq('active', true)
-    .maybeSingle();
+  // Looked up via a database function (not a direct table query): the
+  // anon key can no longer read the birth_code column at all, so the
+  // match happens server-side and only id/name/sort_order come back.
+  const { data, error } = await supabaseClient.rpc('match_employee_code', { p_code: code });
   if (error) throw error;
-  return data;
+  return data && data.length ? data[0] : null;
 }
 
 async function fetchTodayTasks() {
